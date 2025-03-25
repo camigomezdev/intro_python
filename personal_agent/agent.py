@@ -1,8 +1,11 @@
 import os
 import getpass
+
 import pandas as pd
+
 from langchain import hub
 from langchain.agents import AgentExecutor, create_tool_calling_agent
+
 from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
 
@@ -35,7 +38,7 @@ def promedio(numbers: list) -> int:
 llm = ChatOpenAI(
     model="gpt-4o",
     temperature=0,
-    max_tokens=None,
+    max_tokens=4000,
     timeout=None,
     max_retries=2,
     api_key=os.getenv("OPENAI_API_KEY")
@@ -47,13 +50,15 @@ prompt = hub.pull("hwchase17/openai-tools-agent")
 
 tools = [read_csv, promedio]
 agent = create_tool_calling_agent(llm, tools, prompt)
+
 agent_executor = AgentExecutor(
     agent=agent,
     tools=tools,
     verbose=True,
 )
-ai_msg = agent_executor.invoke(
-    {"input": "Dime el promedio de las edades del contenido del archivo datos.csv"})
+ai_msg = agent_executor.invoke({
+    "input": "Dime el promedio de edades del contenido del archivo datos.csv"
+})
 
 
 print("---- Respuesta del Agente ----")

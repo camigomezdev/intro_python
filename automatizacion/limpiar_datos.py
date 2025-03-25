@@ -11,15 +11,20 @@ df = df[df["Estado"] == "Activo"]
 
 # 4️⃣ Rellenar valores faltantes en "Horas Trabajadas"
 # con el promedio del departamento
-df["Horas Trabajadas"] = df.groupby(
-    "Departamento")["Horas Trabajadas"].transform(lambda x: x.fillna(x.mean()))
+
+
+def promedio(x):
+    return x.fillna(x.mean())
+
+
+agrupar_departamentos = df.groupby("Departamento")
+df["Horas Trabajadas"] = agrupar_departamentos["Horas Trabajadas"].transform(
+    promedio)
 
 # 5️⃣ Generar un resumen de promedio de horas trabajadas por departamento
 reporte = df.groupby("Departamento")["Horas Trabajadas"].mean().reset_index()
 
 # 6️⃣ Guardar el reporte en un archivo Excel
-with pd.ExcelWriter("reporte_horas.xlsx") as writer:
-    reporte.to_excel(writer, sheet_name="Resumen", index=False)
-    df.to_excel(writer, sheet_name="Empleados", index=False)
+reporte.to_excel("salida.xlsx", sheet_name="Resumen", index=False)
 
 print("✅ Reporte generado exitosamente: 'reporte_horas.xlsx'")
